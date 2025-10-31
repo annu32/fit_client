@@ -1,13 +1,16 @@
 import axios from 'axios';
 
-// 1. DEFINE THE DEPLOYMENT VARIABLE FIRST (This handles local vs. live URL)
-// This checks the environment. It uses the Netlify-injected variable, or falls back to localhost.
-//const DEPLOYED_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// 1. DEFINE THE DEPLOYMENT VARIABLE
+// This uses the Netlify-injected environment variable (VITE_API_URL) for production,
+// and falls back to http://localhost:5000 for local development.
+const DEPLOYED_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // 2. CREATE THE AXIOS INSTANCE
 const API = axios.create({
-    // Use the dynamic variable for the base URL
-    baseURL: 'http://localhost:5000', 
+    // This is now dynamic and will correctly point to:
+    // - http://localhost:5000 when running locally
+    // - https://fit-server-3.onrender.com when deployed on Netlify (if VITE_API_URL is set)
+    baseURL: DEPLOYED_API_URL, 
     withCredentials: true,
 });
 
@@ -44,7 +47,8 @@ API.interceptors.response.use(
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             // Redirect the user to the login page
-            window.location.href = '/login';
+            // Note: This assumes you are using React Router or similar.
+            window.location.href = '/login'; 
         }
         // For all other errors, pass them on
         return Promise.reject(error);
