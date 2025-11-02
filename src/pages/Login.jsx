@@ -12,7 +12,7 @@ function Login({ setPage, setUser }) {
 
     // 3. Add try...catch block for API call
     try {
-      const response = await fetch('https://fit-server-3.onrender.com', {
+      const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

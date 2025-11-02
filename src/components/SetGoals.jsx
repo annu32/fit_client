@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 function SetGoals() {
+  // Use state to manage input values
   const [dailyCalories, setDailyCalories] = useState(2000);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState(3);
   
+  // State for feedback messages
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // To show loading state
+  const [loading, setLoading] = useState(true);
 
   // 1. --- Load existing goals when component mounts ---
   useEffect(() => {
@@ -30,11 +32,10 @@ function SetGoals() {
 
         if (response.ok) {
           if (data) {
-            // If user has goals, set them in the form
-            setDailyCalories(data.dailyCalories);
-            setWeeklyWorkouts(data.weeklyWorkouts);
+            // Set the state using existing goal data (ensuring it's treated as a number)
+            setDailyCalories(Number(data.dailyCalories));
+            setWeeklyWorkouts(Number(data.weeklyWorkouts));
           }
-          // If data is null (no goals set), the form keeps its default values
         } else {
           throw new Error(data.message || 'Failed to fetch goals');
         }
@@ -47,13 +48,30 @@ function SetGoals() {
     };
 
     fetchGoals();
-  }, []); // Empty array [] ensures this runs only on mount
+  }, []); 
 
-  // 2. --- Handle submitting the form ---
+  // 2. --- Handle submitting the form with Validation ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
+
+    // --- 🎯 CLIENT-SIDE VALIDATION BLOCK ADDED ---
+    const calGoal = Number(dailyCalories);
+    const workoutGoal = Number(weeklyWorkouts);
+
+    // 1. Validate Target Daily Calories
+    if (isNaN(calGoal) || calGoal <= 0) {
+      setError('Target Daily Calories must be a positive number.');
+      return; // Stop submission
+    }
+
+    // 2. Validate Target Workouts Per Week
+    if (isNaN(workoutGoal) || workoutGoal <= 0) {
+      setError('Target Workouts Per Week must be a positive number (at least 1).');
+      return; // Stop submission
+    }
+    // ------------------------------------------------
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -70,8 +88,9 @@ function SetGoals() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          dailyCalories: Number(dailyCalories), 
-          weeklyWorkouts: Number(weeklyWorkouts) 
+          // Use the validated number values
+          dailyCalories: calGoal, 
+          weeklyWorkouts: workoutGoal
         })
       });
 
@@ -81,7 +100,7 @@ function SetGoals() {
         throw new Error(data.message || 'Failed to save goals');
       }
 
-      setMessage(data.message); // "Goals saved successfully"
+      setMessage(data.message || 'Goals saved successfully!');
 
     } catch (err) {
       setError(err.message);
@@ -105,6 +124,8 @@ function SetGoals() {
           value={dailyCalories}
           onChange={(e) => setDailyCalories(e.target.value)}
           required
+          min="1" // ⬅️ HTML Constraint for better user experience
+          aria-label="Target Daily Calories"
         />
       </label>
 
@@ -116,13 +137,15 @@ function SetGoals() {
           value={weeklyWorkouts}
           onChange={(e) => setWeeklyWorkouts(e.target.value)}
           required
+          min="1" // ⬅️ HTML Constraint for better user experience
+          aria-label="Target Workouts Per Week"
         />
       </label>
       
       <button type="submit" className="btn btn-success">Save Goals</button>
       
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'green', fontWeight: 'bold' }}>✅ {message}</p>}
+      {error && <p style={{ color: 'red', fontWeight: 'bold' }}>❌ {error}</p>}
     </form>
   );
 }
