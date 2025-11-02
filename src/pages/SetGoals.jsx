@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 UPDATE: The single source of truth for your live API endpoint
+const API_BASE_URL = 'https://fit-server-3.onrender.com/api/goals'; 
+
 function SetGoals() {
   const [dailyCalories, setDailyCalories] = useState(2000);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState(3);
   
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // To show loading state
+  const [loading, setLoading] = useState(true);
 
   // 1. --- Load existing goals when component mounts ---
   useEffect(() => {
@@ -19,7 +22,8 @@ function SetGoals() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/goals', {
+        // Fetching from the new live URL
+        const response = await fetch(API_BASE_URL, { 
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -30,11 +34,9 @@ function SetGoals() {
 
         if (response.ok) {
           if (data) {
-            // If user has goals, set them in the form
-            setDailyCalories(data.dailyCalories);
-            setWeeklyWorkouts(data.weeklyWorkouts);
+            setDailyCalories(Number(data.dailyCalories));
+            setWeeklyWorkouts(Number(data.weeklyWorkouts));
           }
-          // If data is null (no goals set), the form keeps its default values
         } else {
           throw new Error(data.message || 'Failed to fetch goals');
         }
@@ -47,13 +49,27 @@ function SetGoals() {
     };
 
     fetchGoals();
-  }, []); // Empty array [] ensures this runs only once
+  }, []); 
 
-  // 2. --- Handle submitting the form ---
+  // 2. --- Handle submitting the form (with Validation) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
+
+    // Client-Side Validation Block 
+    const calGoal = Number(dailyCalories);
+    const workoutGoal = Number(weeklyWorkouts);
+
+    if (isNaN(calGoal) || calGoal <= 0) {
+      setError('Target Daily Calories must be a positive number.');
+      return; 
+    }
+
+    if (isNaN(workoutGoal) || workoutGoal <= 0) {
+      setError('Target Workouts Per Week must be a positive number.');
+      return; 
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -62,16 +78,16 @@ function SetGoals() {
     }
 
     try {
-      // Call the POST /api/goals endpoint
-      const response = await fetch('http://localhost:5000/api/goals', {
+      // Posting to the new live URL
+      const response = await fetch(API_BASE_URL, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          dailyCalories: Number(dailyCalories), 
-          weeklyWorkouts: Number(weeklyWorkouts) 
+          dailyCalories: calGoal, 
+          weeklyWorkouts: workoutGoal
         })
       });
 
@@ -81,7 +97,7 @@ function SetGoals() {
         throw new Error(data.message || 'Failed to save goals');
       }
 
-      setMessage(data.message); // "Goals saved successfully"
+      setMessage(data.message || 'Goals saved successfully!');
 
     } catch (err) {
       setError(err.message);
@@ -97,27 +113,31 @@ function SetGoals() {
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '400px' }}>
       <h2>Set Your Goals</h2>
       
-      <label>
+      <label className="form-label">
         Target Daily Calories:
         <input
           type="number"
+          className="form-control"
           value={dailyCalories}
           onChange={(e) => setDailyCalories(e.target.value)}
           required
+          min="1"
         />
       </label>
 
-      <label>
+      <label className="form-label">
         Target Workouts Per Week:
         <input
           type="number"
+          className="form-control"
           value={weeklyWorkouts}
           onChange={(e) => setWeeklyWorkouts(e.target.value)}
           required
+          min="1"
         />
       </label>
       
-      <button type="submit">Save Goals</button>
+      <button type="submit" className="btn btn-success">Save Goals</button>
       
       {message && <p style={{ color: 'green' }}>{message}</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}

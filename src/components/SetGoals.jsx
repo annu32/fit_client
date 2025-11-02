@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const API_BASE_URL = 'https://fit-server-3.onrender.com/api/goals'; 
+
 function SetGoals() {
   // Use state to manage input values
   const [dailyCalories, setDailyCalories] = useState(2000);
@@ -21,7 +24,8 @@ function SetGoals() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/goals', {
+        // Fetching from the live URL
+        const response = await fetch(API_BASE_URL, { 
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -56,7 +60,7 @@ function SetGoals() {
     setError('');
     setMessage('');
 
-    // --- 🎯 CLIENT-SIDE VALIDATION BLOCK ADDED ---
+    // --- CLIENT-SIDE VALIDATION BLOCK (Kept intact) ---
     const calGoal = Number(dailyCalories);
     const workoutGoal = Number(weeklyWorkouts);
 
@@ -80,8 +84,8 @@ function SetGoals() {
     }
 
     try {
-      // Call the POST /api/goals endpoint
-      const response = await fetch('http://localhost:5000/api/goals', {
+      // Posting to the live URL
+      const response = await fetch(API_BASE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +128,7 @@ function SetGoals() {
           value={dailyCalories}
           onChange={(e) => setDailyCalories(e.target.value)}
           required
-          min="1" // ⬅️ HTML Constraint for better user experience
+          min="1" // ⬅️ HTML Constraint
           aria-label="Target Daily Calories"
         />
       </label>
@@ -137,7 +141,7 @@ function SetGoals() {
           value={weeklyWorkouts}
           onChange={(e) => setWeeklyWorkouts(e.target.value)}
           required
-          min="1" // ⬅️ HTML Constraint for better user experience
+          min="1" // ⬅️ HTML Constraint
           aria-label="Target Workouts Per Week"
         />
       </label>

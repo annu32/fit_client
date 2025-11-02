@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+// 🎯 Defining the constant for the live registration endpoint
+const REGISTER_API_URL = 'https://fit-server-3.onrender.com/api/register'; 
+
 function Register({ setPage }) {
   const [form, setForm] = useState({
     name: '',
@@ -8,7 +11,6 @@ function Register({ setPage }) {
     confirmPassword: ''
   });
   
-  // 1. Add state for error and success messages
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
@@ -16,27 +18,31 @@ function Register({ setPage }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 2. Make handleSubmit async
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Clear previous messages
     setError(null);
     setSuccessMessage(null);
 
-    // 3. Use setError instead of alert for better UI
+    // Basic client-side validation
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+    
+    // Optional: Add minimum password length check
+    if (form.password.length < 6) {
+        setError("Password must be at least 6 characters long.");
+        return;
+    }
 
-    // 4. Add try...catch block for API call
     try {
-      const response = await fetch('http://localhost:5000/api/register', {
+      // 🎯 Using the constant API URL
+      const response = await fetch(REGISTER_API_URL, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        // Only send the fields your API needs
         body: JSON.stringify({
           name: form.name,
           email: form.email,
@@ -60,8 +66,6 @@ function Register({ setPage }) {
         password: '',
         confirmPassword: ''
       });
-      // We don't need setPage('login') here,
-      // the user can see the success message and click the link.
 
     } catch (err) {
       setError(err.message);
@@ -71,7 +75,20 @@ function Register({ setPage }) {
   return (
     <div className="container-fluid min-vh-100 d-flex flex-column justify-content-center bg-light">
       <h2 className="text-center mb-4">Join Fit_Gy Today!</h2>
-      <form onSubmit={handleSubmit} className="w-100 px-3 px-md-5">
+      <form onSubmit={handleSubmit} className="w-100 px-3 px-md-5" style={{maxWidth: '450px', margin: '0 auto'}}>
+        
+        {/* Error and Success Messages */}
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
+        {successMessage && (
+          <div className="alert alert-success" role="alert">
+            {successMessage}
+          </div>
+        )}
+
         <div className="mb-3">
           <label htmlFor="registerName" className="form-label">Your Name</label>
           <input
@@ -120,18 +137,6 @@ function Register({ setPage }) {
             required
           />
         </div>
-
-        {/* 5. Add blocks to display messages */}
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
-        {successMessage && (
-          <div className="alert alert-success" role="alert">
-            {successMessage}
-          </div>
-        )}
 
         <div className="d-grid mb-3">
           <button type="submit" className="btn btn-success btn-lg">Register</button>

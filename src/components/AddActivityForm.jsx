@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const ACTIVITIES_API_URL = 'https://fit-server-3.onrender.com/api/activities';
+
 /**
  * A form component for users to log a new fitness activity.
  * Includes client-side validation to ensure duration and calories are positive numbers.
- * * @param {object} props
+ * @param {object} props
  * @param {function} props.onActivityAdded - Callback function to notify the parent component 
  * when an activity is successfully added (e.g., to refresh a list).
  */
@@ -57,7 +60,8 @@ function AddActivityForm({ onActivityAdded }) {
 
     // --- 2. API Submission ---
     try {
-      const response = await fetch('http://localhost:5000/api/activities', {
+      // 🎯 Using the constant live URL
+      const response = await fetch(ACTIVITIES_API_URL, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

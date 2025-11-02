@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const ACTIVITIES_API_URL = 'https://fit-server-3.onrender.com/api/activities';
+
 function ActivityList() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +19,8 @@ function ActivityList() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/activities', {
+        // Fetching from the live URL
+        const response = await fetch(ACTIVITIES_API_URL, { 
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -37,7 +41,7 @@ function ActivityList() {
     };
 
     fetchActivities();
-  }, []); // The empty array [] means this effect runs once on mount
+  }, []); 
 
   // 2. Handle deleting an activity
   const handleDelete = async (activityId) => {
@@ -49,7 +53,8 @@ function ActivityList() {
     setError(null); // Clear previous errors
 
     try {
-      const response = await fetch(`http://localhost:5000/api/activities/${activityId}`, {
+      // Deleting using the live URL (with the activity ID appended)
+      const response = await fetch(`${ACTIVITIES_API_URL}/${activityId}`, { 
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -82,11 +87,14 @@ function ActivityList() {
             <div className="d-flex justify-content-between align-items-start">
               <div>
                 <h5 className="card-title">{activity.activityName}</h5>
-                <p className="card-text mb-1">Duration: {activity.duration} minutes</p>
-                <p className="card-text mb-1">Calories: {activity.caloriesBurned} kcal</p>
+                <p className="card-text mb-1">Duration: **{activity.duration}** minutes</p>
+                <p className="card-text mb-1">Calories: **{activity.caloriesBurned}** kcal</p>
                 <small className="text-muted">Date: {new Date(activity.date).toLocaleDateString()}</small>
               </div>
-              <button onClick={() => handleDelete(activity._id)} className="btn btn-sm btn-outline-danger">
+              <button 
+                onClick={() => handleDelete(activity._id)} 
+                className="btn btn-sm btn-outline-danger"
+              >
                 Delete
               </button>
             </div>

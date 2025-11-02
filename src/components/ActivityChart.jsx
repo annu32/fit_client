@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 // We'll use the recharts library to build the chart
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+// 🎯 Defining the constant for the live API endpoint
+const ACTIVITIES_API_URL = 'https://fit-server-3.onrender.com/api/activities';
+
 function ActivityChart() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +17,8 @@ function ActivityChart() {
         return;
       }
       try {
-        const response = await fetch('http://localhost:5000/api/activities', {
+        // Fetching from the live URL
+        const response = await fetch(ACTIVITIES_API_URL, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {

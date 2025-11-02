@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 
+// 🎯 Defining the constant for the live login endpoint
+const LOGIN_API_URL = 'https://fit-server-3.onrender.com/api/login'; 
+
 function Login({ setPage, setUser }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null); // <-- 1. Add state for errors
+  const [error, setError] = useState(null); 
 
-  // 2. Make handleSubmit async
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null); // Clear previous errors
 
-    // 3. Add try...catch block for API call
+    // Basic client-side validation (optional, but good practice)
+    if (!email || !password) {
+        setError('Please enter both email and password.');
+        return;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      // 🎯 Using the constant API URL
+      const response = await fetch(LOGIN_API_URL, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,17 +37,16 @@ function Login({ setPage, setUser }) {
 
       // --- SUCCESS ---
       
-      // 4. Save the token to localStorage for future API calls
+      // Save the token to localStorage for future authenticated API calls
       localStorage.setItem('token', data.token);
       
-      // 5. !! THIS IS THE NEW LINE YOU NEED !!
-      // Save the user object to localStorage so App.jsx can read it on reload
+      // Save the user object for session persistence
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // 6. Set the user in the main App state (this is from your API)
-      setUser(data.user); // data.user should be { id, name, email }
+      // Set the user in the main App state
+      setUser(data.user); 
       
-      // 7. Redirect to the home page (which will now show the dashboard)
+      // Redirect to the home page (dashboard)
       setPage('home');
 
     } catch (err) {
@@ -51,7 +58,7 @@ function Login({ setPage, setUser }) {
   return (
     <div className="min-vh-100 d-flex flex-column justify-content-center bg-light">
       <h2 className="text-center mb-4 fw-bold">Login to Fit_Gy</h2>
-      <form onSubmit={handleSubmit} className="px-3 w-100">
+      <form onSubmit={handleSubmit} className="px-3 w-100" style={{maxWidth: '450px', margin: '0 auto'}}>
         <div className="mb-3">
           <label htmlFor="loginEmail" className="form-label fw-semibold">Email</label>
           <input
@@ -75,7 +82,7 @@ function Login({ setPage, setUser }) {
           />
         </div>
 
-        {/* 7. Add this block to display errors */}
+        {/* Display errors */}
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}

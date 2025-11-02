@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const ACTIVITIES_API_BASE = 'https://fit-server-3.onrender.com/api/activities';
+
 // 1. Accept activityId, setPage (to go back), and onActivityDeleted
 function ActivityDetail({ activityId, setPage, onActivityDeleted }) {
   const [activity, setActivity] = useState(null);
@@ -17,7 +20,8 @@ function ActivityDetail({ activityId, setPage, onActivityDeleted }) {
       }
       
       try {
-        const response = await fetch(`http://localhost:5000/api/activities/${activityId}`, {
+        // Fetching a single activity from the live URL
+        const response = await fetch(`${ACTIVITIES_API_BASE}/${activityId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -46,7 +50,8 @@ function ActivityDetail({ activityId, setPage, onActivityDeleted }) {
     
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:5000/api/activities/${activityId}`, {
+      // Deleting the activity using the live URL
+      const response = await fetch(`${ACTIVITIES_API_BASE}/${activityId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

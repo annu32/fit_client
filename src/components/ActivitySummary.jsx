@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const ACTIVITIES_API_URL = 'https://fit-server-3.onrender.com/api/activities';
+
 // 1. Accept setPage and setSelectedActivityId from Home.jsx
 function ActivitySummary({ setPage, setSelectedActivityId }) {
   const [activities, setActivities] = useState([]);
@@ -13,7 +16,8 @@ function ActivitySummary({ setPage, setSelectedActivityId }) {
         return;
       }
       try {
-        const response = await fetch('http://localhost:5000/api/activities', {
+        // Fetching from the live URL
+        const response = await fetch(ACTIVITIES_API_URL, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -33,7 +37,7 @@ function ActivitySummary({ setPage, setSelectedActivityId }) {
   // 2. Click handler function
   const handleActivityClick = (id) => {
     setSelectedActivityId(id); // Set the ID in App.jsx
-    setPage('activityDetail');  // Change the page
+    setPage('activityDetail');  // Change the page
   };
 
   return (
@@ -43,7 +47,7 @@ function ActivitySummary({ setPage, setSelectedActivityId }) {
         {loading && <p>Loading activities...</p>}
         
         {!loading && activities.length === 0 && (
-          <p>You haven't logged any activities yet. Click "Add New Activity" to start!</p>
+          <p>You haven't logged any activities yet. Click **"Add New Activity"** to start!</p>
         )}
         
         {!loading && activities.length > 0 && (
@@ -75,4 +79,3 @@ function ActivitySummary({ setPage, setSelectedActivityId }) {
 }
 
 export default ActivitySummary;
-

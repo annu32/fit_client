@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// 🎯 Defining the constant for the live API endpoint
+const GOALS_API_URL = 'https://fit-server-3.onrender.com/api/goals';
+
 function GoalSummary() {
   const [goal, setGoal] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +15,8 @@ function GoalSummary() {
         return;
       }
       try {
-        const response = await fetch('http://localhost:5000/api/goals', {
+        // Fetching from the live URL
+        const response = await fetch(GOALS_API_URL, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -33,9 +37,11 @@ function GoalSummary() {
       <div className="card-body">
         <h2 className="card-title h4 mb-3">Your Goals</h2>
         {loading && <p>Loading goals...</p>}
+        
         {!loading && !goal && (
-          <p>You haven't set any goals yet. Click "Manage Goals" to start!</p>
+          <p>You haven't set any goals yet. Click **"Manage Goals"** to start!</p>
         )}
+        
         {!loading && goal && (
           <div>
             <div className="mb-2">
@@ -54,4 +60,3 @@ function GoalSummary() {
 }
 
 export default GoalSummary;
-
